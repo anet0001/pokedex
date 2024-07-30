@@ -2,5 +2,4 @@
 
 Name: Nonso Anetoh
 Student Number: 041096963
-Project: TBD
-
+Project: Pokedex

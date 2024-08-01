@@ -70,7 +70,7 @@ class App {
       this.elements.onBoarding.children.instructions,
       {
         autoAlpha: 0,
-        stagger: 0.1,
+        stagger: 0.125,
         // ease to make it softer
         ease: "power1.in",
       }
@@ -78,7 +78,7 @@ class App {
 
     this.onBoardingTimeline.call(() => {
       this.elements.onBoarding.children.progress.forEach((progress, index) => {
-        progress.style.animationDelay = `${index * 0.25}s`;
+        progress.style.animationDelay = `${index * 0.35}s`;
 
         progress.classList.add("active");
 
@@ -131,6 +131,9 @@ class App {
           each: 0.05,
         },
         ease: "back.out(1.2)",
+      })
+      .to(this.elements.pokedex.element, {
+        autoAlpha: 1,
       });
 
     this.preloaderTimeline.call(() => {

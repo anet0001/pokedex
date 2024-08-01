@@ -7,18 +7,80 @@
     <title>Pokedex</title>
   </head>
   <body>
+    <section id="preloader">
+      <p class="preloader__prompt">
+        <span class="preloader__prompt-inner">
+          to <button class="preloader__button">Start</button>
+        </span>
+      </p>
+      <div class="pokedex-preview">
+        <div class="pokedex-preview__inner"></div>
+      </div>
+    </section>
+    <section id="onBoarding">
+      <div class="instruction">
+        <svg
+          class="progress"
+          viewBox="0 0 298 4"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M0 2H297.5" stroke="#6C6C6C" stroke-width="3" />
+        </svg>
+      </div>
+      <div class="instruction">
+        <svg
+          class="progress"
+          viewBox="0 0 298 4"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M0 2H297.5" stroke="#6C6C6C" stroke-width="3" />
+        </svg>
+      </div>
+    </section>
     <header id="header">
       <section class="focus-controls">
-        <button class="focus-controls__button">A</button>
-        <button class="focus-controls__button">B</button>
+        <button class="focus-controls__button">
+          <svg
+            class="focus-controls__line"
+            viewBox="0 0 127 127"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="63.5" cy="63.5" r="63" stroke="#B44755" />
+          </svg>
+
+          A
+        </button>
+        <button class="focus-controls__button">
+          <svg
+            class="focus-controls__line"
+            viewBox="0 0 127 127"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="63.5" cy="63.5" r="63" stroke="#B44755" />
+          </svg>
+
+          B
+        </button>
+        <button class="focus-controls__button">
+          <svg
+            class="focus-controls__line"
+            viewBox="0 0 127 127"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="63.5" cy="63.5" r="63" stroke="#B44755" />
+          </svg>
+
+          C
+        </button>
       </section>
     </header>
     <main id="container">
-      <section id="preloader">
-        <p class="preloader__prompt">
-          Click to <button class="preloader__button">Start</button>
-        </p>
-      </section>
+      <div id="pokedex"></div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script type="module" src="app/index.js"></script>

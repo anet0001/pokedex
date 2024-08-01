@@ -10,7 +10,7 @@
     <section id="preloader">
       <p class="preloader__prompt">
         <span class="preloader__prompt-inner">
-          to <button class="preloader__button">Start</button>
+          to <button class="preloader__button"><span>Start</span></button>
         </span>
       </p>
       <div class="pokedex-preview">
@@ -44,11 +44,19 @@
         <button class="focus-controls__button">
           <svg
             class="focus-controls__line"
-            viewBox="0 0 127 127"
+            width="100"
+            height="100"
+            viewBox="0 0 100 100"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle cx="63.5" cy="63.5" r="63" stroke="#B44755" />
+            <circle
+              cx="50"
+              cy="50"
+              r="49.25"
+              stroke="#B44755"
+              stroke-width="1.2"
+            />
           </svg>
 
           A
@@ -56,11 +64,19 @@
         <button class="focus-controls__button">
           <svg
             class="focus-controls__line"
-            viewBox="0 0 127 127"
+            width="100"
+            height="100"
+            viewBox="0 0 100 100"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle cx="63.5" cy="63.5" r="63" stroke="#B44755" />
+            <circle
+              cx="50"
+              cy="50"
+              r="49.25"
+              stroke="#B44755"
+              stroke-width="1.2"
+            />
           </svg>
 
           B
@@ -68,11 +84,19 @@
         <button class="focus-controls__button">
           <svg
             class="focus-controls__line"
-            viewBox="0 0 127 127"
+            width="100"
+            height="100"
+            viewBox="0 0 100 100"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle cx="63.5" cy="63.5" r="63" stroke="#B44755" />
+            <circle
+              cx="50"
+              cy="50"
+              r="49.25"
+              stroke="#B44755"
+              stroke-width="1.2"
+            />
           </svg>
 
           C
@@ -80,7 +104,21 @@
       </section>
     </header>
     <main id="container">
-      <div id="pokedex"></div>
+      <div id="pokedex">
+        <div class="pokedex__left">
+          <div class="pokedex__active-screen"></div>
+          <div class="pokedex__deck">
+            <div class="pokedex__info"></div>
+            <div class="pokedex__controls">
+              <button class="pokedex__control pokedex__control--up"></button>
+              <button class="pokedex__control pokedex__control--down"></button>
+              <button class="pokedex__control pokedex__control--left"></button>
+              <button class="pokedex__control pokedex__control--right"></button>
+            </div>
+          </div>
+        </div>
+        <div class="pokedex__right"></div>
+      </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script type="module" src="app/index.js"></script>

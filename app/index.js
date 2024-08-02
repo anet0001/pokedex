@@ -44,20 +44,27 @@ class App {
             ),
           },
           "pokedex-list": {
-            element: document.querySelector("#pokedex .pokedex__list"),
+            element: document.querySelector("#pokedex .pokedex__right"),
             trigger: document.querySelector(
               ".focus-controls__button[data-target='pokedex-list']"
             ),
           },
         },
       },
-      focusControls: document.querySelectorAll(".focus-controls__button"),
+      focusControls: {
+        element: document.querySelector(".focus-controls"),
+        children: {
+          button: [...document.querySelectorAll(".focus-controls__button")],
+        },
+      },
     };
 
     // local storage data handler
     this.data = {
       isOnBoarded: false,
     };
+
+    this.currentFocus = null;
 
     this.onPreloaderClick = this.onPreloaderClick.bind(this);
 
@@ -89,7 +96,6 @@ class App {
       {
         autoAlpha: 0,
         stagger: 0.125,
-        // ease to make it softer
         ease: "power1.in",
       }
     );
@@ -128,7 +134,6 @@ class App {
   }
 
   onPreloaderClick(target) {
-    // disable button
     target.disabled = true;
     this.preloaderTimeline = gsap.timeline();
 
@@ -140,7 +145,7 @@ class App {
       .to(this.elements.preloader.children.prompt, {
         yPercent: -110,
       })
-      .from(this.elements.focusControls, {
+      .from(this.elements.focusControls.children.button, {
         autoAlpha: 0,
         yPercent: 30,
         stagger: {
@@ -162,6 +167,72 @@ class App {
         this.elements.onBoarding.element.remove();
       }
     });
+  }
+
+  focus(area) {
+    let { element, trigger } = area;
+
+    if (this.currentFocusedArea === trigger) {
+      gsap.to(this.elements.pokedex.element, {
+        x: 0,
+        y: 0,
+        scale: 1,
+        duration: 1,
+        ease: "power2.inOut",
+      });
+      this.currentFocusedArea = null;
+      return;
+    }
+
+    this.currentFocusedArea = trigger;
+
+    gsap.to(this.elements.pokedex.element, {
+      x: 0,
+      y: 0,
+      scale: 1,
+      duration: 0.5,
+      ease: "power2.inOut",
+      onComplete: () => {
+        let rect = element.getBoundingClientRect();
+        let x = rect.left + rect.width / 2;
+        let y = rect.top + rect.height / 2;
+
+        let centerX = window.innerWidth / 2;
+        let centerY = window.innerHeight / 2;
+
+        let padding =
+          parseFloat(getComputedStyle(document.documentElement).fontSize) * 2;
+        let scaleX = window.innerWidth / rect.width;
+        let scaleY = (window.innerHeight - 2 * padding) / rect.height;
+        let scale = Math.min(scaleX, scaleY);
+
+        const minScale = 1.2;
+        const maxScale = 2.0;
+        scale = Math.max(minScale, Math.min(scale, maxScale));
+
+        let deltaX = (centerX - x) * scale;
+        let deltaY = (centerY - y) * scale;
+
+        gsap.to(this.elements.pokedex.element, {
+          x: deltaX,
+          y: deltaY,
+          scale: scale,
+          duration: 1,
+          ease: "power3.inOut",
+        });
+      },
+    });
+  }
+
+  resetFocus() {
+    gsap.to(this.elements.pokedex.element, {
+      x: 0,
+      y: 0,
+      scale: 1,
+      duration: 1,
+      ease: "power2.inOut",
+    });
+    this.currentFocusedArea = null;
   }
 
   addEventListeners() {
@@ -196,6 +267,35 @@ class App {
         this.onPreloaderClick(event.target);
       }
     });
+
+    this.elements.focusControls.element.addEventListener("click", (event) => {
+      console.log(event.target.classList);
+      if (event.target.classList.contains("focus-controls__button")) {
+        const {
+          dataset: { target },
+        } = event.target;
+
+        let area = this.elements.focusAreas.children[target];
+
+        this.focus(area);
+
+        // temporarily add a blink animation to the area.element to indicate focus
+        gsap.to(area.element, {
+          keyframes: [
+            {
+              opacity: 0.5,
+              duration: 0.1,
+            },
+            {
+              opacity: 1,
+              duration: 0.1,
+            },
+          ],
+        });
+      }
+    });
+
+    window.addEventListener("resize", this.resetFocus.bind(this));
   }
 }
 

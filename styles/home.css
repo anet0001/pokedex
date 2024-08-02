@@ -400,9 +400,78 @@
     bottom: -57.5rem;
     padding: 0.6rem;
   }
+
+  #header .focus-controls {
+    gap: 1.5rem;
+    font-size: 1.8rem;
+  }
+
+  #pokedex .pokedex__left {
+    width: 26.47rem;
+    height: 40.465rem;
+    padding: 1.1rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+
+  #pokedex .pokedex__active-screen {
+    height: 21.426rem;
+  }
+
+  #pokedex .pokedex__info {
+    width: 13.5rem;
+    height: 6.7rem;
+  }
+
+  #pokedex .pokedex__controls {
+    width: 6.722rem;
+  }
+
+  #pokedex .pokedex__control--left,
+  #pokedex .pokedex__control--right {
+    height: 1.793rem;
+    width: calc(50% - 0.8965rem);
+  }
+
+  #pokedex .pokedex__control--up,
+  #pokedex .pokedex__control--down {
+    width: 1.793rem;
+    height: calc(50% - 0.8965rem);
+  }
+
+  #pokedex .pokedex__right {
+    width: 23.225rem;
+    height: 32.556rem;
+    padding: 1.1rem;
+    gap: 1.1rem;
+  }
+
+  #pokedex .pokedex__right .pokedex__list {
+    height: 27.54rem;
+  }
+
+  #pokedex .pokedex__right .pokedex__tab {
+    width: 4.431rem;
+    height: 1.346rem;
+  }
+
+  #pokedex .pokedex__right .pokedex__tabs .group {
+    gap: 0.561rem;
+  }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 430px) {
+  #container {
+    min-height: unset;
+  }
+
+  #pokedex {
+    flex-direction: column;
+    align-items: center;
+  }
+
   #preloader .preloader__prompt {
     font-size: 1.6rem;
   }
@@ -412,5 +481,60 @@
     height: 52.298rem;
     bottom: -27.5rem;
     padding: 0.419rem;
+  }
+
+  #header {
+    display: none;
+  }
+
+  /* make onboarding max width */
+
+  #pokedex .pokedex__left {
+    width: 43rem;
+    height: unset;
+    padding: 1.8rem;
+    gap: 5.7rem;
+  }
+
+  #pokedex .pokedex__active-screen {
+    height: 34.806rem;
+  }
+
+  #pokedex .pokedex__info {
+    width: 22.3rem;
+    height: 11rem;
+  }
+
+  #pokedex .pokedex__controls {
+    width: 11.083rem;
+  }
+
+  #pokedex .pokedex__control--left,
+  #pokedex .pokedex__control--right {
+    height: 2.956rem;
+    width: calc(50% - 1.478rem);
+  }
+
+  #pokedex .pokedex__control--up,
+  #pokedex .pokedex__control--down {
+    width: 2.956rem;
+    height: calc(50% - 1.478rem);
+  }
+
+  #pokedex .pokedex__right {
+    width: 43rem;
+    height: unset;
+    padding: 2rem;
+
+    gap: 2rem;
+  }
+
+  #pokedex .pokedex__right .pokedex__list {
+    height: 50.998rem;
+  }
+
+  #pokedex .pokedex__right .pokedex__tab {
+    width: 8.205rem;
+    height: 2.493rem;
   }
 }

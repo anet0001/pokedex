@@ -1,3 +1,5 @@
+// TODO: Convert animations to use GSAP while considering media queries
+
 class App {
   constructor() {
     // element selector handler

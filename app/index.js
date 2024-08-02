@@ -31,8 +31,24 @@ class App {
       },
       focusAreas: {
         children: {
-          element: "",
-          trigger: "",
+          "active-screen": {
+            element: document.querySelector("#pokedex .pokedex__active-screen"),
+            trigger: document.querySelector(
+              ".focus-controls__button[data-target='active-screen']"
+            ),
+          },
+          "pokedex-info": {
+            element: document.querySelector("#pokedex .pokedex__info"),
+            trigger: document.querySelector(
+              ".focus-controls__button[data-target='pokedex-info']"
+            ),
+          },
+          "pokedex-list": {
+            element: document.querySelector("#pokedex .pokedex__list"),
+            trigger: document.querySelector(
+              ".focus-controls__button[data-target='pokedex-list']"
+            ),
+          },
         },
       },
       focusControls: document.querySelectorAll(".focus-controls__button"),
@@ -122,7 +138,7 @@ class App {
         ease: "back.in(1.2)",
       })
       .to(this.elements.preloader.children.prompt, {
-        yPercent: -100,
+        yPercent: -110,
       })
       .from(this.elements.focusControls, {
         autoAlpha: 0,

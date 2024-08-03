@@ -2,6 +2,7 @@
 
 class App {
   constructor() {
+    this.isAnimating = false;
     // element selector handler
     this.elements = {
       preloader: {
@@ -79,7 +80,7 @@ class App {
       },
     };
 
-    this.currentFocus = null;
+    this.currentFocusedArea = null;
 
     this.onPreloaderClick = this.onPreloaderClick.bind(this);
 
@@ -205,56 +206,80 @@ class App {
   }
 
   focus(area) {
-    let { element, trigger } = area;
+    console.log(area);
+    if (this.isAnimating) {
+      gsap.killTweensOf(this.elements.pokedex.element);
+    }
 
-    if (this.currentFocusedArea === trigger) {
-      gsap.to(this.elements.pokedex.element, {
-        x: 0,
-        y: 0,
-        scale: 1,
-        duration: 1,
-        ease: "power2.inOut",
-      });
-      this.currentFocusedArea = null;
+    // Check if the area is already focused
+    if (this.currentFocusArea === area) {
+      console.log("Area is already focused, resetting transform");
+      this.resetTransform();
+      this.currentFocusArea = null;
       return;
     }
 
-    this.currentFocusedArea = trigger;
+    let { element, trigger } = area;
+    let rect = element.getBoundingClientRect();
+    let pokedexRect = this.elements.pokedex.element.getBoundingClientRect();
+    let x = rect.left + rect.width / 2;
+    let y = rect.top + rect.height / 2;
+    console.log("Element Center:", { x, y });
+    let centerX = window.innerWidth / 2;
+    let centerY = window.innerHeight / 2;
+    console.log("Screen Center:", { centerX, centerY });
+    let currentTransform = window.getComputedStyle(
+      this.elements.pokedex.element
+    ).transform;
+    let matrix = new WebKitCSSMatrix(currentTransform);
+    let currentTranslateX = matrix.m41;
+    let currentTranslateY = matrix.m42;
+    let currentScale = matrix.a; // Assuming uniform scaling
 
+    // Read the predefined scale value from the data attribute
+    let newScale = parseFloat(element.getAttribute("data-scale")) || 1;
+
+    // Calculate the scale factor to apply
+    let scaleFactor = newScale / currentScale;
+
+    // Adjust translation calculations to account for the current scale and translation
+    let adjustedTranslateX =
+      (centerX - x) * scaleFactor + currentTranslateX * scaleFactor;
+    let adjustedTranslateY =
+      (centerY - y) * scaleFactor + currentTranslateY * scaleFactor;
+    console.log("Adjusted Translation:", {
+      adjustedTranslateX,
+      adjustedTranslateY,
+    });
+
+    this.isAnimating = true;
+    gsap.to(this.elements.pokedex.element, {
+      x: adjustedTranslateX,
+      y: adjustedTranslateY,
+      scale: newScale,
+      duration: 1,
+      ease: "power2.inOut",
+      onComplete: () => {
+        console.log("Animation Complete");
+        this.isAnimating = false;
+      },
+    });
+
+    // Update the currently focused area
+    this.currentFocusArea = area;
+  }
+
+  // Function to reset the transform to its initial state
+  resetTransform() {
     gsap.to(this.elements.pokedex.element, {
       x: 0,
       y: 0,
       scale: 1,
-      duration: 0.5,
+      duration: 1,
       ease: "power2.inOut",
       onComplete: () => {
-        let rect = element.getBoundingClientRect();
-        let x = rect.left + rect.width / 2;
-        let y = rect.top + rect.height / 2;
-
-        let centerX = window.innerWidth / 2;
-        let centerY = window.innerHeight / 2;
-
-        let padding =
-          parseFloat(getComputedStyle(document.documentElement).fontSize) * 2;
-        let scaleX = window.innerWidth / rect.width;
-        let scaleY = (window.innerHeight - 2 * padding) / rect.height;
-        let scale = Math.min(scaleX, scaleY);
-
-        const minScale = 1.2;
-        const maxScale = 2.0;
-        scale = Math.max(minScale, Math.min(scale, maxScale));
-
-        let deltaX = (centerX - x) * scale;
-        let deltaY = (centerY - y) * scale;
-
-        gsap.to(this.elements.pokedex.element, {
-          x: deltaX,
-          y: deltaY,
-          scale: scale,
-          duration: 1,
-          ease: "power3.inOut",
-        });
+        console.log("Reset Complete");
+        this.isAnimating = false;
       },
     });
   }
@@ -266,6 +291,7 @@ class App {
       scale: 1,
       duration: 1,
       ease: "power2.inOut",
+      onComplete: () => console.log("Reset Complete"),
     });
     this.currentFocusedArea = null;
   }

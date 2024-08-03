@@ -7,6 +7,10 @@
     <title>Pokedex</title>
   </head>
   <body>
+    <div id="guide">
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
     <section id="preloader">
       <p class="preloader__prompt">
         <span class="preloader__prompt-inner">
@@ -106,9 +110,9 @@
     <main id="container">
       <div id="pokedex">
         <div class="pokedex__left">
-          <div class="pokedex__active-screen"></div>
+          <div class="pokedex__active-screen" data-scale="2"></div>
           <div class="pokedex__deck">
-            <div class="pokedex__info"></div>
+            <div class="pokedex__info" data-scale="2.6"></div>
             <div class="pokedex__controls">
               <button class="pokedex__control pokedex__control--up"></button>
               <button class="pokedex__control pokedex__control--down"></button>
@@ -117,7 +121,7 @@
             </div>
           </div>
         </div>
-        <div class="pokedex__right">
+        <div class="pokedex__right" data-scale="1.5">
           <div class="pokedex__tabs">
             <div class="group">
               <button class="pokedex__tab pokedex__tab--captured"></button>

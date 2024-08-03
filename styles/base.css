@@ -12,6 +12,11 @@ body {
   font-family: "Inter", sans-serif;
   background-color: var(--color-background);
   overscroll-behavior: none;
+  overflow-x: hidden;
+}
+
+main {
+  overflow: hidden;
 }
 
 a {

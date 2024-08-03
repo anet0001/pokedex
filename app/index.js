@@ -27,7 +27,9 @@ class App {
       },
       pokedex: {
         element: document.querySelector("#pokedex"),
-        children: {},
+        children: {
+          tabs: document.querySelector(".pokedex__tabs"),
+        },
       },
       focusAreas: {
         children: {
@@ -62,15 +64,48 @@ class App {
     // local storage data handler
     this.data = {
       isOnBoarded: false,
+      pokemon: {
+        data: [],
+        loading: false,
+        nextPage: 1,
+      },
+      captured_pokemon: [],
+      context: {
+        name: "",
+        data: {
+          pokedex: [],
+          captured_pokemon: [],
+        },
+      },
     };
 
     this.currentFocus = null;
 
     this.onPreloaderClick = this.onPreloaderClick.bind(this);
 
-    this.populateData();
+    if (this.data.context.name === "captured_pokemon") {
+      return;
+    } else {
+      this.populateData();
 
-    this.addEventListeners();
+      this.addEventListeners();
+
+      this.init();
+
+      if (this.data.context.name === "captured_pokemon") {
+      } else {
+        console.log("stupid: ", this.data.context.data.pokedex);
+        this.populateList(this.data.context.data.pokedex);
+      }
+    }
+  }
+
+  async init() {
+    try {
+      await this.fetchPokemon();
+    } catch (error) {
+      console.error("Error fetching Pokémon data:", error);
+    }
   }
 
   populateData() {
@@ -235,6 +270,52 @@ class App {
     this.currentFocusedArea = null;
   }
 
+  async fetchPokemon(trigger = "") {
+    const url =
+      "https://pokeapi.co/api/v2/pokemon" +
+      `?offset=${
+        this.data.pokemon.nextPage <= 1 ? 0 : this.data.pokemon.nextPage * 10
+      }`;
+
+    this.data.pokemon.loading = true;
+
+    await fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        this.parseData(data);
+        if (trigger === "load-more") {
+          // if the load more button is clicked, set the currently displayed pokemon to be the last 20 pokemon from the pokemon array
+          this.data.context.data.pokedex = this.data.pokemon.data.slice(-20);
+          console.log("app: ", this.data);
+        }
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      });
+  }
+
+  parseData(data) {
+    console.log("jh", data);
+    const offset = data.next.match(/offset=(\d+)/)[1];
+
+    this.data.pokemon.data = [...this.data.pokemon.data, ...data.results];
+    this.data.pokemon.nextPage = Number(offset) / 10;
+    // localStorage.setItem("pokemon", JSON.stringify(this.data.pokemon.data));
+
+    this.data.pokemon.loading = false;
+
+    // get first 20 pokemon uusing slice
+    this.data.context.data.pokedex = this.data.pokemon.data.slice(0, 20);
+    console.log(this.data);
+  }
+
+  populateList(data) {
+    console.log("list", data);
+    // data.forEach((pokemon) => {
+    //   console.log(pokemon);
+    // });
+  }
+
   addEventListeners() {
     this.elements.preloader.element.addEventListener("mouseover", (event) => {
       if (event.target.classList.contains("preloader__button")) {
@@ -292,6 +373,14 @@ class App {
             },
           ],
         });
+      }
+    });
+
+    this.elements.pokedex.children.tabs.addEventListener("click", (event) => {
+      console.log(event.target);
+
+      if (event.target.classList.contains("pokedex__tab--more")) {
+        this.fetchPokemon("load-more");
       }
     });
 

@@ -3,7 +3,6 @@
 class App {
   constructor() {
     this.isAnimating = false;
-    // element selector handler
     this.elements = {
       preloader: {
         element: document.querySelector("#preloader"),
@@ -29,7 +28,11 @@ class App {
       pokedex: {
         element: document.querySelector("#pokedex"),
         children: {
+          activeScreen: document.querySelector(".pokedex__active-screen"),
+          activePokemon: document.querySelector(".pokedex__active-pokemon"),
           tabs: document.querySelector(".pokedex__tabs"),
+          list: document.querySelector(".pokedex__list"),
+          pokemon: [...document.querySelectorAll(".pokedex__pokemon-inner")],
         },
       },
       focusAreas: {
@@ -62,17 +65,18 @@ class App {
       },
     };
 
+    this.nextPage = 0;
+
     // local storage data handler
     this.data = {
-      isOnBoarded: false,
+      isOnBoarded: true,
       pokemon: {
         data: [],
         loading: false,
-        nextPage: 1,
       },
       captured_pokemon: [],
       context: {
-        name: "",
+        name: "pokedex",
         data: {
           pokedex: [],
           captured_pokemon: [],
@@ -91,13 +95,9 @@ class App {
 
       this.addEventListeners();
 
-      this.init();
-
-      if (this.data.context.name === "captured_pokemon") {
-      } else {
-        console.log("stupid: ", this.data.context.data.pokedex);
+      this.init().then(() => {
         this.populateList(this.data.context.data.pokedex);
-      }
+      });
     }
   }
 
@@ -119,6 +119,16 @@ class App {
         }
       } else {
         this.data[key] = JSON.parse(localStorage.getItem(key));
+      }
+    });
+  }
+
+  syncData() {
+    Object.keys(this.data).forEach((key) => {
+      if (typeof this.data[key] === "string") {
+        localStorage.setItem(key, this.data[key]);
+      } else {
+        localStorage.setItem(key, JSON.stringify(this.data[key]));
       }
     });
   }
@@ -157,11 +167,11 @@ class App {
             this.progressTimeline.call(() => {
               this.elements.onBoarding.element.remove();
               // NOTE: persist onboarding state
-              // this.data.isOnBoarded = true;
-              // localStorage.setItem(
-              //   "isOnBoarded",
-              //   JSON.stringify(this.data.isOnBoarded)
-              // );
+              this.data.isOnBoarded = true;
+              localStorage.setItem(
+                "isOnBoarded",
+                JSON.stringify(this.data.isOnBoarded)
+              );
             });
           });
         }
@@ -206,14 +216,11 @@ class App {
   }
 
   focus(area) {
-    console.log(area);
     if (this.isAnimating) {
       gsap.killTweensOf(this.elements.pokedex.element);
     }
 
-    // Check if the area is already focused
     if (this.currentFocusArea === area) {
-      console.log("Area is already focused, resetting transform");
       this.resetTransform();
       this.currentFocusArea = null;
       return;
@@ -224,33 +231,24 @@ class App {
     let pokedexRect = this.elements.pokedex.element.getBoundingClientRect();
     let x = rect.left + rect.width / 2;
     let y = rect.top + rect.height / 2;
-    console.log("Element Center:", { x, y });
     let centerX = window.innerWidth / 2;
     let centerY = window.innerHeight / 2;
-    console.log("Screen Center:", { centerX, centerY });
     let currentTransform = window.getComputedStyle(
       this.elements.pokedex.element
     ).transform;
     let matrix = new WebKitCSSMatrix(currentTransform);
     let currentTranslateX = matrix.m41;
     let currentTranslateY = matrix.m42;
-    let currentScale = matrix.a; // Assuming uniform scaling
+    let currentScale = matrix.a;
 
-    // Read the predefined scale value from the data attribute
     let newScale = parseFloat(element.getAttribute("data-scale")) || 1;
 
-    // Calculate the scale factor to apply
     let scaleFactor = newScale / currentScale;
 
-    // Adjust translation calculations to account for the current scale and translation
     let adjustedTranslateX =
       (centerX - x) * scaleFactor + currentTranslateX * scaleFactor;
     let adjustedTranslateY =
       (centerY - y) * scaleFactor + currentTranslateY * scaleFactor;
-    console.log("Adjusted Translation:", {
-      adjustedTranslateX,
-      adjustedTranslateY,
-    });
 
     this.isAnimating = true;
     gsap.to(this.elements.pokedex.element, {
@@ -260,16 +258,13 @@ class App {
       duration: 1,
       ease: "power2.inOut",
       onComplete: () => {
-        console.log("Animation Complete");
         this.isAnimating = false;
       },
     });
 
-    // Update the currently focused area
     this.currentFocusArea = area;
   }
 
-  // Function to reset the transform to its initial state
   resetTransform() {
     gsap.to(this.elements.pokedex.element, {
       x: 0,
@@ -278,7 +273,6 @@ class App {
       duration: 1,
       ease: "power2.inOut",
       onComplete: () => {
-        console.log("Reset Complete");
         this.isAnimating = false;
       },
     });
@@ -291,7 +285,6 @@ class App {
       scale: 1,
       duration: 1,
       ease: "power2.inOut",
-      onComplete: () => console.log("Reset Complete"),
     });
     this.currentFocusedArea = null;
   }
@@ -299,9 +292,7 @@ class App {
   async fetchPokemon(trigger = "") {
     const url =
       "https://pokeapi.co/api/v2/pokemon" +
-      `?offset=${
-        this.data.pokemon.nextPage <= 1 ? 0 : this.data.pokemon.nextPage * 10
-      }`;
+      `?offset=${this.nextPage * 10}&limit=20`;
 
     this.data.pokemon.loading = true;
 
@@ -310,9 +301,9 @@ class App {
       .then((data) => {
         this.parseData(data);
         if (trigger === "load-more") {
-          // if the load more button is clicked, set the currently displayed pokemon to be the last 20 pokemon from the pokemon array
-          this.data.context.data.pokedex = this.data.pokemon.data.slice(-20);
-          console.log("app: ", this.data);
+          this.data.context.name = "pokedex";
+          this.data.context.data.pokedex = [...this.data.pokemon.data];
+          this.populateList(this.data.context.data.pokedex);
         }
       })
       .catch((error) => {
@@ -320,26 +311,74 @@ class App {
       });
   }
 
+  async fetchPokemonData(id) {
+    const pokemon = this.data.context.data[this.data.context.name].find(
+      (pokemon) => this.getPokemonId(pokemon.url) === Number(id)
+    );
+
+    const data = await fetch(pokemon.url);
+    const response = await data.json();
+
+    this.elements.pokedex.children.activePokemon.src =
+      response["sprites"]["versions"]["generation-v"]["black-white"][
+        "animated"
+      ]["front_default"];
+
+    this.elements.pokedex.children.activePokemon.alt = pokemon.name;
+
+    document.querySelector(".pokedex__active-screen .name").textContent =
+      pokemon.name;
+
+    document.querySelector(".pokedex__active-screen .catch").disabled = false;
+  }
+
   parseData(data) {
-    console.log("jh", data);
     const offset = data.next.match(/offset=(\d+)/)[1];
-
     this.data.pokemon.data = [...this.data.pokemon.data, ...data.results];
-    this.data.pokemon.nextPage = Number(offset) / 10;
-    // localStorage.setItem("pokemon", JSON.stringify(this.data.pokemon.data));
-
+    this.nextPage = Number(offset) / 10;
     this.data.pokemon.loading = false;
-
-    // get first 20 pokemon uusing slice
     this.data.context.data.pokedex = this.data.pokemon.data.slice(0, 20);
-    console.log(this.data);
+
+    this.syncData();
+  }
+
+  getPokemonId(url) {
+    return Number(
+      url.substring(
+        url.substring(0, url.length - 2).lastIndexOf("/") + 1,
+        url.length - 1
+      )
+    );
   }
 
   populateList(data) {
-    console.log("list", data);
-    // data.forEach((pokemon) => {
-    //   console.log(pokemon);
-    // });
+    const poke = [];
+
+    console.log(data);
+
+    data.forEach((pokemon) => {
+      const isCaptured = this.data.context.data.captured_pokemon.find(
+        (poke) => poke.name === pokemon.name
+      );
+
+      poke.push(`
+      	<div class="pokedex__pokemon-inner ${
+          isCaptured && "captured"
+        }" data-name="${pokemon.name}" data-id="${this.getPokemonId(
+        pokemon.url
+      )}">
+      		<div class="pokedex__pokemon-image">
+      			<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.getPokemonId(
+              pokemon.url
+            )}.png" alt="${pokemon.name}" />
+      		</div>
+      	</div>
+      `);
+    });
+
+    this.elements.pokedex.children.list.innerHTML = "";
+
+    this.elements.pokedex.children.list.innerHTML = poke.join("");
   }
 
   addEventListeners() {
@@ -376,7 +415,6 @@ class App {
     });
 
     this.elements.focusControls.element.addEventListener("click", (event) => {
-      console.log(event.target.classList);
       if (event.target.classList.contains("focus-controls__button")) {
         const {
           dataset: { target },
@@ -403,12 +441,95 @@ class App {
     });
 
     this.elements.pokedex.children.tabs.addEventListener("click", (event) => {
-      console.log(event.target);
-
       if (event.target.classList.contains("pokedex__tab--more")) {
         this.fetchPokemon("load-more");
+      } else if (event.target.classList.contains("pokedex__tab--captured")) {
+        console.log("show captured pokemon");
+        this.data.context.name = "captured_pokemon";
+        this.syncData();
+        this.populateList(this.data.context.data.captured_pokemon);
+      } else if (event.target.classList.contains("pokedex__tab--pokedex")) {
+        console.log("show pokedex");
+        this.data.context.name = "pokedex";
+        this.syncData();
+        this.populateList(this.data.context.data.pokedex);
+      } else {
+        return;
       }
     });
+
+    this.elements.pokedex.children.list.addEventListener("click", (event) => {
+      if (event.target.classList.contains("pokedex__pokemon-inner")) {
+        const { id } = event.target.dataset;
+
+        this.fetchPokemonData(id);
+
+        // check if the pokemon is already captured
+        if (
+          this.data.context.data.captured_pokemon.find(
+            (pokemon) => pokemon.name === event.target.dataset.name
+          )
+        ) {
+          document.querySelector(".pokedex__active-screen .catch").textContent =
+            "RELEASE";
+        } else {
+          document.querySelector(".pokedex__active-screen .catch").textContent =
+            "CATCH";
+        }
+      }
+    });
+
+    document
+      .querySelector(".pokedex__active-screen .catch")
+      .addEventListener("click", (event) => {
+        const name = document.querySelector(
+          ".pokedex__active-screen .name"
+        ).textContent;
+
+        console.log(name);
+
+        // find pokemon in this.elements.context.data["pokedex"] using the name in this.elements.pokedex.children.activePokemon
+        const pokemon = this.data.context.data.pokedex.find(
+          (pokemon) => pokemon.name === name
+        );
+
+        // if it exists, and is not already captured, add it to this.elements.context.data["captured_pokemon"]
+
+        if (
+          !this.data.context.data.captured_pokemon.find(
+            (pokemon) => pokemon.name === name
+          )
+        ) {
+          this.data.context.data.captured_pokemon.push(pokemon);
+          document.querySelector(".pokedex__active-screen .catch").textContent =
+            "RELEASE";
+
+          document
+            .querySelector(`.pokedex__pokemon-inner[data-name='${name}']`)
+            .classList.add("captured");
+
+          if (this.data.context.name === "captured_pokemon") {
+            this.populateList(this.data.context.data.captured_pokemon);
+          }
+        } else {
+          this.data.context.data.captured_pokemon =
+            this.data.context.data.captured_pokemon.filter(
+              (pokemon) => pokemon.name !== name
+            );
+          document.querySelector(".pokedex__active-screen .catch").textContent =
+            "CATCH";
+
+          document
+            .querySelector(`.pokedex__pokemon-inner[data-name='${name}']`)
+            .classList.remove("captured");
+
+          if (this.data.context.name === "captured_pokemon") {
+            this.populateList(this.data.context.data.captured_pokemon);
+          }
+        }
+
+        this.syncData();
+      });
 
     window.addEventListener("resize", this.resetFocus.bind(this));
   }

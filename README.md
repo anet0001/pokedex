@@ -1,6 +1,4 @@
-# mtm6302-capstone-anet0001
+# Building in public - Pokedex
 
-Name: Nonso Anetoh
-Student Number: 041096963
-Project: TBD
+## Current state
 

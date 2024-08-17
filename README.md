@@ -1,8 +1,3 @@
 To embed a video in your markdown file, you can use the following syntax:
 
-```markdown
-<video controls>
-<source src="./showcase/intro-animation.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-```
+![video]("https://drive.google.com/file/d/10GtssqEP_k404FYhzWYQqSE6AS81Px9v/view?usp=drive_link")

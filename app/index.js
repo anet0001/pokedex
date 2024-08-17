@@ -1,5 +1,3 @@
-// TODO: Convert animations to use GSAP while considering media queries
-
 class App {
   constructor() {
     this.isAnimating = false;
@@ -67,7 +65,6 @@ class App {
 
     this.nextPage = 0;
 
-    // local storage data handler
     this.data = {
       isOnBoarded: true,
       pokemon: {
@@ -303,6 +300,7 @@ class App {
         if (trigger === "load-more") {
           this.data.context.name = "pokedex";
           this.data.context.data.pokedex = [...this.data.pokemon.data];
+          return;
           this.populateList(this.data.context.data.pokedex);
         }
       })
@@ -352,6 +350,7 @@ class App {
   }
 
   populateList(data) {
+    return;
     const poke = [];
 
     console.log(data);
@@ -384,7 +383,6 @@ class App {
   addEventListeners() {
     this.elements.preloader.element.addEventListener("mouseover", (event) => {
       if (event.target.classList.contains("preloader__button")) {
-        // check if its a touch device
         if ("ontouchstart" in window || navigator.maxTouchPoints) {
           return;
         } else {
@@ -397,7 +395,6 @@ class App {
 
     this.elements.preloader.element.addEventListener("mouseout", (event) => {
       if (event.target.classList.contains("preloader__button")) {
-        // check if its a touch device
         if ("ontouchstart" in window || navigator.maxTouchPoints) {
           return;
         } else {
@@ -424,7 +421,6 @@ class App {
 
         this.focus(area);
 
-        // temporarily add a blink animation to the area.element to indicate focus
         gsap.to(area.element, {
           keyframes: [
             {
@@ -457,79 +453,6 @@ class App {
         return;
       }
     });
-
-    this.elements.pokedex.children.list.addEventListener("click", (event) => {
-      if (event.target.classList.contains("pokedex__pokemon-inner")) {
-        const { id } = event.target.dataset;
-
-        this.fetchPokemonData(id);
-
-        // check if the pokemon is already captured
-        if (
-          this.data.context.data.captured_pokemon.find(
-            (pokemon) => pokemon.name === event.target.dataset.name
-          )
-        ) {
-          document.querySelector(".pokedex__active-screen .catch").textContent =
-            "RELEASE";
-        } else {
-          document.querySelector(".pokedex__active-screen .catch").textContent =
-            "CATCH";
-        }
-      }
-    });
-
-    document
-      .querySelector(".pokedex__active-screen .catch")
-      .addEventListener("click", (event) => {
-        const name = document.querySelector(
-          ".pokedex__active-screen .name"
-        ).textContent;
-
-        console.log(name);
-
-        // find pokemon in this.elements.context.data["pokedex"] using the name in this.elements.pokedex.children.activePokemon
-        const pokemon = this.data.context.data.pokedex.find(
-          (pokemon) => pokemon.name === name
-        );
-
-        // if it exists, and is not already captured, add it to this.elements.context.data["captured_pokemon"]
-
-        if (
-          !this.data.context.data.captured_pokemon.find(
-            (pokemon) => pokemon.name === name
-          )
-        ) {
-          this.data.context.data.captured_pokemon.push(pokemon);
-          document.querySelector(".pokedex__active-screen .catch").textContent =
-            "RELEASE";
-
-          document
-            .querySelector(`.pokedex__pokemon-inner[data-name='${name}']`)
-            .classList.add("captured");
-
-          if (this.data.context.name === "captured_pokemon") {
-            this.populateList(this.data.context.data.captured_pokemon);
-          }
-        } else {
-          this.data.context.data.captured_pokemon =
-            this.data.context.data.captured_pokemon.filter(
-              (pokemon) => pokemon.name !== name
-            );
-          document.querySelector(".pokedex__active-screen .catch").textContent =
-            "CATCH";
-
-          document
-            .querySelector(`.pokedex__pokemon-inner[data-name='${name}']`)
-            .classList.remove("captured");
-
-          if (this.data.context.name === "captured_pokemon") {
-            this.populateList(this.data.context.data.captured_pokemon);
-          }
-        }
-
-        this.syncData();
-      });
 
     window.addEventListener("resize", this.resetFocus.bind(this));
   }

@@ -1,26 +1,12 @@
-# mtm6302-capstone-anet0001
-
-Name: Nonso Anetoh
-Student Number: 041096963
-Project: Pokedex
-
-## Project Report
-
-### Steps Taken
-
-- **Structure**: Created the HTML structure, incorporating key sections such as the preloader, onboarding, and Pokedex interface.
-- **Styling**: Applied CSS styles for layout, with a focus on responsive design.
-- **Functionality**: Developed the core functionality using JavaScript, handling animations with GSAP, data fetching from the Pokémon API, and local storage management.
-- **Interactivity**: Implemented dynamic elements like focus areas and interactive controls.
-
-### Resources Used
-
-- **GSAP**: For smooth animations.
-- **Pokémon API**: For retrieving Pokémon data.
-- **Bootstrap**: For styling.
-
-### Challenges Faced
-
-- **Data Management**: Managing and synchronizing data between local storage and the application state was complex.
-- **Responsive Design**: Ensuring a seamless experience across devices required careful adjustment of styles and layout.
-- **API Integration**: Handling errors and asynchronous data fetching from the Pokémon API was challenging.
+```html
+<div style="position: relative; padding-bottom: 62.5%; height: 0;">
+  <iframe
+    src="https://www.loom.com/embed/b8d6156c85094a5f8282de4167933a54?sid=a1efccb8-4c94-4033-ab44-5fee4cac7cee"
+    frameborder="0"
+    webkitallowfullscreen
+    mozallowfullscreen
+    allowfullscreen
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+  ></iframe>
+</div>
+```

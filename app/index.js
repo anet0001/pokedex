@@ -66,7 +66,7 @@ class App {
     this.nextPage = 0;
 
     this.data = {
-      isOnBoarded: true,
+      isOnBoarded: false,
       pokemon: {
         data: [],
         loading: false,
